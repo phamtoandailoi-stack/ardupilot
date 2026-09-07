@@ -19,6 +19,8 @@ def main():
     parser.add_argument('--output', required=True)
     parser.add_argument('--set-param', action='append', default=[], metavar='NAME=VALUE',
                         help='set a persistent parameter after heartbeat and record its echo')
+    parser.add_argument('--reboot-at-end', action='store_true',
+                        help='request a normal FC reboot after capture')
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
@@ -103,6 +105,10 @@ def main():
                 if now - last_progress >= 5:
                     print('Telemetry:', dict(counts), flush=True)
                     last_progress = now
+            if args.reboot_at_end and target is not None:
+                mav.command_long_send(*target, 246, 0, 1, 0, 0, 0, 0, 0, 0)
+                port.flush()
+                time.sleep(0.5)
     finally:
         port.close()
     summary = {'port': args.port, 'baud': args.baud, 'seconds': time.monotonic()-start,
