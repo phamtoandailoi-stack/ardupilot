@@ -17,6 +17,8 @@ def main():
     parser.add_argument('--baud', type=int, default=115200)
     parser.add_argument('--seconds', type=float, default=30)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--set-param', action='append', default=[], metavar='NAME=VALUE',
+                        help='set a persistent parameter after heartbeat and record its echo')
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
@@ -35,6 +37,12 @@ def main():
     ranges = {}
     statuses = []
     params = {}
+    param_sets = {}
+    for item in args.set_param:
+        name, separator, value = item.partition('=')
+        if not separator or not name or len(name) > 16:
+            parser.error(f'invalid --set-param value: {item!r}')
+        param_sets[name] = float(value)
     target = None
     start = time.monotonic()
     last_heartbeat = 0
@@ -89,6 +97,9 @@ def main():
                         mav.command_long_send(*target, 512, 0, 148, 0, 0, 0, 0, 0, 0)
                         for name in parameter_names:
                             mav.param_request_read_send(*target, name.encode('ascii'), -1)
+                        for name, value in param_sets.items():
+                            mav.param_set_send(*target, name.encode('ascii'), value,
+                                               mavutil.mavlink.MAV_PARAM_TYPE_REAL32)
                 if now - last_progress >= 5:
                     print('Telemetry:', dict(counts), flush=True)
                     last_progress = now
@@ -97,6 +108,7 @@ def main():
     summary = {'port': args.port, 'baud': args.baud, 'seconds': time.monotonic()-start,
                'target': target, 'counts': dict(counts), 'latest': latest,
                'ranges': ranges, 'parameters': params, 'status_text': statuses}
+    summary['requested_param_sets'] = param_sets
     summary_path = prefix.with_suffix('.summary.json')
     with summary_path.open('x', encoding='utf-8') as stream:
         json.dump(summary, stream, indent=2, default=str)

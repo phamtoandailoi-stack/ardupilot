@@ -46,11 +46,12 @@ ESP32_RCOUT GPIO_NUM_7
 ESP32_RCOUT GPIO_NUM_6
 ESP32_RCOUT GPIO_NUM_5
 
-# No SD card on this carrier. Stream logs over MAVLink during bring-up.
+# No SD card on this carrier. Keep DataFlash backends compiled out; live
+# telemetry remains available on SERIAL0.
 define HAL_LOGGING_FILESYSTEM_ENABLED 0
 define HAL_LOGGING_DATAFLASH_ENABLED 0
-define HAL_LOGGING_MAVLINK_ENABLED 1
-define HAL_LOGGING_BACKENDS_DEFAULT 2
+define HAL_LOGGING_MAVLINK_ENABLED 0
+define HAL_LOGGING_BACKENDS_DEFAULT 0
 define AP_FILESYSTEM_ESP32_ENABLED 0
 define AP_SCRIPTING_ENABLED 0
 

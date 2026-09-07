@@ -9,9 +9,10 @@ SCHED_LOOP_RATE 150
 MOT_PWM_TYPE 0
 RC_SPEED 400
 
-# This carrier has no SD card. Stream logs over MAVLink.
-LOG_BACKEND_TYPE 2
-LOG_DISARMED 1
+# This carrier has no SD card. Keep DataFlash logging disabled; live MAVLink
+# telemetry is available on SERIAL0 without a logging backend.
+LOG_BACKEND_TYPE 0
+LOG_DISARMED 0
 
 # Enable battery monitoring only after measuring ESP32 ADC scaling.
 BATT_MONITOR 0
