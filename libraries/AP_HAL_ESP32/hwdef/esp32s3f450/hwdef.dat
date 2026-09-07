@@ -31,6 +31,12 @@ ESP32_SERIAL UART_NUM_0  GPIO_NUM_44   GPIO_NUM_43
 ESP32_SERIAL UART_NUM_1  GPIO_NUM_15   GPIO_NUM_16
 ESP32_SERIAL UART_NUM_2  GPIO_NUM_17   GPIO_NUM_NC
 
+# Keep the USB-UART telemetry port on MAVLink2 at 115200 after every reboot.
+# Without these defaults, SERIAL0 can remain console-only and Mission Planner
+# receives boot text but no MAVLink heartbeat.
+define DEFAULT_SERIAL0_PROTOCOL SerialProtocol_MAVLink2
+define DEFAULT_SERIAL0_BAUD 115
+
 define DEFAULT_SERIAL2_PROTOCOL SerialProtocol_RCIN
 define DEFAULT_SERIAL2_BAUD 115
 
