@@ -34,6 +34,10 @@ ESP32_SERIAL UART_NUM_2  GPIO_NUM_17   GPIO_NUM_NC
 define DEFAULT_SERIAL2_PROTOCOL SerialProtocol_RCIN
 define DEFAULT_SERIAL2_BAUD 115
 
+# AP_HAL_ESP32's pulse decoder is compiled even though this target receives
+# iBUS through UART2. Keep its unused RMT input on the spare GPIO18.
+define HAL_ESP32_RMT_RX_PIN_NUMBER GPIO_NUM_18
+
 # ArduPilot Quad-X motor order:
 # M1 front-right, M2 rear-left, M3 front-left, M4 rear-right.
 # The list defines RC output channels 1..4 in that order.
