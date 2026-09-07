@@ -24,6 +24,7 @@
 
 #include "AP_InertialSensor_BMI160.h"
 #include "AP_InertialSensor_BMI270.h"
+#include "AP_InertialSensor_BMI323.h"
 #include "AP_InertialSensor_Backend.h"
 #include "AP_InertialSensor_L3G4200D.h"
 #include "AP_InertialSensor_LSM6DSV.h"

@@ -1,0 +1,57 @@
+name: F450 ESP32-S3 Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/f450-esp32s3-bmi323-bringup
+    paths:
+      - '.github/workflows/f450_esp32s3_build.yml'
+      - 'ArduCopter/**'
+      - 'libraries/AP_HAL_ESP32/**'
+      - 'libraries/AP_InertialSensor/**'
+
+concurrency:
+  group: f450-esp32s3-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-copter:
+    runs-on: ubuntu-22.04
+    container: ardupilot/ardupilot-dev-esp32:v0.2.0
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Build ArduCopter for f450esp32s3
+        shell: bash
+        run: |
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+          source "${IDF_PATH}/export.sh"
+          ./waf configure --board f450esp32s3
+          ./waf copter
+
+      - name: Collect flash images
+        shell: bash
+        run: |
+          cp build/f450esp32s3/esp-idf_build/ardupilot.bin ArduCopter.f450esp32s3.bin
+          cp build/f450esp32s3/esp-idf_build/ardupilot.elf ArduCopter.f450esp32s3.elf
+          cp build/f450esp32s3/esp-idf_build/bootloader/bootloader.bin bootloader.f450esp32s3.bin
+          cp build/f450esp32s3/esp-idf_build/partition_table/partition-table.bin partition-table.f450esp32s3.bin
+          cp build/f450esp32s3/esp-idf_build/flash_project_args flash_project_args.f450esp32s3
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v7
+        with:
+          name: f450esp32s3-arducopter
+          path: |
+            ArduCopter.f450esp32s3.bin
+            ArduCopter.f450esp32s3.elf
+            bootloader.f450esp32s3.bin
+            partition-table.f450esp32s3.bin
+            flash_project_args.f450esp32s3
+          retention-days: 14
