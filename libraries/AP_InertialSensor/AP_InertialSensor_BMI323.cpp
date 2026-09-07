@@ -209,9 +209,11 @@ void AP_InertialSensor_BMI323::read_sensor()
     const float accel_scale = (16.0f * GRAVITY_MSS) / 32768.0f;
     const float gyro_scale = radians(2000.0f) / 32768.0f;
 
-    // Preserve the native-to-airframe conversion verified with MadFlight.
+    // MadFlight uses a gravity vector (+g when level); ArduPilot expects
+    // specific force (-g when level). Negate MadFlight's accel convention.
+    // Both accel and gyro now use the same proper body-axis rotation.
     // ArduPilot applies the hwdef ROTATION_* and calibration after this.
-    Vector3f accel(-raw[0], raw[1], raw[2]);
+    Vector3f accel(raw[0], -raw[1], -raw[2]);
     Vector3f gyro(raw[3], -raw[4], -raw[5]);
     accel *= accel_scale;
     gyro *= gyro_scale;

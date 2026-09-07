@@ -1,4 +1,4 @@
-# Conservative bench defaults for the custom F450 ESP32-S3 carrier.
+# Bench defaults for the custom F450 ESP32-S3 carrier.
 FRAME_CLASS 1
 FRAME_TYPE 1
 

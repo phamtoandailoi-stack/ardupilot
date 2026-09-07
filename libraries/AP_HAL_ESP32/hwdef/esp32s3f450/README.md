@@ -1,5 +1,8 @@
 # F450 ESP32-S3 BMI323 bring-up target
 
+Build with `./waf configure --board esp32s3f450` then `./waf copter`.
+The `esp32s3` prefix is required by the Waf chip/toolchain selection.
+
 This target matches the custom carrier that currently runs MadFlight:
 
 - ESP32-S3-WROOM-1-N16R8
