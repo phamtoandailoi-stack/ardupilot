@@ -1,0 +1,17 @@
+# Conservative bench defaults for the custom F450 ESP32-S3 carrier.
+FRAME_CLASS 1
+FRAME_TYPE 1
+
+# AP_HAL_ESP32 cannot sustain normal STM32 flight-controller loop rates.
+SCHED_LOOP_RATE 150
+
+# Standard PWM ESC output only; AP_HAL_ESP32 does not implement DShot.
+MOT_PWM_TYPE 0
+RC_SPEED 400
+
+# This carrier has no SD card. Stream logs over MAVLink.
+LOG_BACKEND_TYPE 2
+LOG_DISARMED 1
+
+# Enable battery monitoring only after measuring ESP32 ADC scaling.
+BATT_MONITOR 0

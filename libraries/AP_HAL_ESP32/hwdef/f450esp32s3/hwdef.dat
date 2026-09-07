@@ -1,0 +1,55 @@
+# F450 custom carrier using ESP32-S3-WROOM-1-N16R8.
+# Bring-up target for the hardware already validated with MadFlight.
+
+define HAL_ESP32_BOARD_NAME "f450esp32s3"
+
+# Dedicated BMI323 SPI bus.
+#            Host      DMA Channel       MOSI        MISO        SCLK
+ESP32_SPIBUS SPI2_HOST SPI_DMA_CH_AUTO   GPIO_NUM_11 GPIO_NUM_12 GPIO_NUM_13
+
+#            Name      Bus Device ChipSel     Mode LowSpeed HighSpeed
+ESP32_SPIDEV bmi323    0   0      GPIO_NUM_10 0    1*MHZ    10*MHZ
+
+# BMP280 and QMC5883P share the board I2C bus.
+#             Port       SDA        SCL        SPEED    INTERNAL SOFT
+ESP32_I2CBUS  I2C_NUM_0  GPIO_NUM_8 GPIO_NUM_9 400*KHZ true     false
+
+# BMI323 raw-axis conversion matches the verified MadFlight CW0 mounting.
+IMU BMI323 SPI:bmi323 ROTATION_NONE
+
+BARO BMP280 I2C:0:0x76
+define HAL_BARO_ALLOW_INIT_NO_BARO 1
+
+define AP_COMPASS_QMC5883P_ENABLED 1
+COMPASS QMC5883P I2C:0:0x2C false ROTATION_ROLL_180
+
+# UART declaration order is significant in AP_HAL_ESP32:
+# index 0 -> SERIAL0, index 1 -> SERIAL3, index 2 -> SERIAL2.
+# SERIAL0: USB-UART; SERIAL3: NEO-M10N; SERIAL2: iBUS receive-only.
+#            Port        RX            TX
+ESP32_SERIAL UART_NUM_0  GPIO_NUM_44   GPIO_NUM_43
+ESP32_SERIAL UART_NUM_1  GPIO_NUM_15   GPIO_NUM_16
+ESP32_SERIAL UART_NUM_2  GPIO_NUM_17   GPIO_NUM_NC
+
+define DEFAULT_SERIAL2_PROTOCOL SerialProtocol_RCIN
+define DEFAULT_SERIAL2_BAUD 115
+
+# ArduPilot Quad-X motor order:
+# M1 front-right, M2 rear-left, M3 front-left, M4 rear-right.
+# The list defines RC output channels 1..4 in that order.
+ESP32_RCOUT GPIO_NUM_4
+ESP32_RCOUT GPIO_NUM_7
+ESP32_RCOUT GPIO_NUM_6
+ESP32_RCOUT GPIO_NUM_5
+
+# No SD card on this carrier. Stream logs over MAVLink during bring-up.
+define HAL_LOGGING_FILESYSTEM_ENABLED 0
+define HAL_LOGGING_DATAFLASH_ENABLED 0
+define HAL_LOGGING_MAVLINK_ENABLED 1
+define HAL_LOGGING_BACKENDS_DEFAULT 2
+define AP_FILESYSTEM_ESP32_ENABLED 0
+define AP_SCRIPTING_ENABLED 0
+
+define AP_AIRSPEED_ENABLED 0
+
+AUTOBUILD_TARGETS Copter
