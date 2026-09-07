@@ -30,6 +30,7 @@
 #define QMC5883P_REG_STATUS             0x09
 #define QMC5883P_REG_CONF1              0x0A
 #define QMC5883P_REG_CONF2              0x0B
+#define QMC5883P_REG_SET_XYZ_SIGN       0x29
 
 #define QMC5883P_ID_VAL 0x80
 
@@ -61,7 +62,7 @@
 #define QMC5883P_RNG_8G  (0x10 << 2)
 #define QMC5883P_RNG_2G  (0x11 << 2)
 
-#define QMC5883P_SET_XYZ_SIGN 0x29
+#define QMC5883P_SET_XYZ_SIGN 0x06
 
 //Reset
 #define QMC5883P_RST 0x80
@@ -108,8 +109,8 @@ bool AP_Compass_QMC5883P::init()
     if (!_check_whoami()) {
         goto fail;
     }
-    //As mentioned in the Datasheet 7.2 to do continues mode 0x29 will set sign for X,Y,Z
-    if (!_dev->write_register(QMC5883P_REG_DATA_OUTPUT_Z_MSB, QMC5883P_SET_XYZ_SIGN)||
+    // Configure the X/Y/Z signs before entering continuous measurement mode.
+    if (!_dev->write_register(QMC5883P_REG_SET_XYZ_SIGN, QMC5883P_SET_XYZ_SIGN)||
         !_dev->write_register(QMC5883P_REG_CONF1,
                               QMC5883P_MODE_CONTINUOUS|
                               QMC5883P_ODR_100HZ|
